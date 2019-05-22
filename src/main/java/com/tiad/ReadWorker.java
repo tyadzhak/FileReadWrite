@@ -1,5 +1,6 @@
 package com.tiad;
 
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -11,11 +12,12 @@ public class ReadWorker implements Runnable {
 
     private BlockingQueue<String> queue;
 
-    private File file = new File(
-            "C:\\Source\\com.tiad\\mentorship\\FileReadWrite\\src\\main\\Resource\\data.txt");
+    private File file;
 
     public ReadWorker(BlockingQueue<String> queue) {
         this.queue = queue;
+        ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        file = new File(contextClassLoader.getResource("data.txt").getFile());
     }
 
     @Override

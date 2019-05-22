@@ -5,6 +5,14 @@ plugins {
 group 'com.tiad.mentorship'
 version '1.0-SNAPSHOT'
 
+sourceSets {
+    main {
+        resources {
+            srcDirs "src/main/resource"
+        }
+    }
+}
+
 sourceCompatibility = 1.8
 
 repositories {
