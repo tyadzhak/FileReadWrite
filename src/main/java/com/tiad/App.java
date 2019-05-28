@@ -13,6 +13,7 @@ public class App {
 
         new Thread(reader).start();
         Thread writeThread = new Thread(writer);
+        writeThread.setName("writer");
         writeThread.start();
         try {
             Thread.sleep(5000);

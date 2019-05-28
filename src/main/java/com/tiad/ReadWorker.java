@@ -23,6 +23,7 @@ public class ReadWorker implements Runnable {
     public void run() {
         BufferedReader br = null;
         try {
+
             br = new BufferedReader(new FileReader(file));
             String buffer;
             int i = 0;
@@ -34,6 +35,7 @@ public class ReadWorker implements Runnable {
             }
             queue.addLast("END");
 
+
         } catch (FileNotFoundException e) {
 
             e.printStackTrace();
@@ -41,7 +43,7 @@ public class ReadWorker implements Runnable {
 
             e.printStackTrace();
         } catch (InterruptedException e) {
-
+            System.out.println("interrupted: " + Thread.currentThread().getName());
         } finally {
             try {
                 br.close();

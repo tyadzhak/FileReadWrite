@@ -12,16 +12,14 @@ public class WriteWorker implements Runnable {
 
     @Override
     public void run() {
-        String buffer = null;
-        try {
-
-            synchronized (App.lock) {
+        synchronized (App.lock) {
+            String buffer = null;
+            try {
                 while (true) {
                     buffer = queue.poll();
 
                     if (buffer == null) {
-                        buffer = "wait";
-                        App.lock.wait(50);
+                        App.lock.wait(3000);
                         continue;
                     }
 
@@ -30,11 +28,11 @@ public class WriteWorker implements Runnable {
 
                     System.out.println(buffer);
                 }
+            } catch (InterruptedException e) {
+                System.out.println("interrupted: " + Thread.currentThread().getName());
+                while (!queue.isEmpty())
+                    System.out.println(queue.poll());
             }
-        } catch (InterruptedException e) {
-            System.out.println("interrupted");
-            if (buffer != null)
-                System.out.println(buffer);
         }
     }
 }
