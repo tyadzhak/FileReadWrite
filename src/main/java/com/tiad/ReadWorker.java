@@ -1,20 +1,19 @@
 package com.tiad;
 
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.concurrent.BlockingQueue;
+import java.util.ArrayDeque;
 
 public class ReadWorker implements Runnable {
 
-    private BlockingQueue<String> queue;
+    private ArrayDeque<String> queue;
 
     private File file;
 
-    public ReadWorker(BlockingQueue<String> queue) {
+    public ReadWorker(ArrayDeque<String> queue) {
         this.queue = queue;
         ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         file = new File(contextClassLoader.getResource("data.txt").getFile());
@@ -29,14 +28,11 @@ public class ReadWorker implements Runnable {
             int i = 0;
             while ((buffer = br.readLine()) != null) {
                 i++;
-                queue.put(buffer);
-//                if(i == 5)
-//                    Thread.currentThread().interrupt();
-//                else
-                    Thread.sleep(1000);
+                queue.addLast(buffer);
+                Thread.sleep(1000);
 
             }
-            queue.put("END");
+            queue.addLast("END");
 
         } catch (FileNotFoundException e) {
 

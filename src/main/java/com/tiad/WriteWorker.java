@@ -1,28 +1,40 @@
 package com.tiad;
 
-import java.util.concurrent.BlockingQueue;
+import java.util.ArrayDeque;
 
 public class WriteWorker implements Runnable {
 
-    private BlockingQueue<String> queue;
+    private ArrayDeque<String> queue;
 
-    public WriteWorker(BlockingQueue<String> queue) {
+    public WriteWorker(ArrayDeque<String> queue) {
         this.queue = queue;
     }
 
     @Override
     public void run() {
+        String buffer = null;
         try {
-            while (true) {
-                String buffer = queue.take();
 
-                if (buffer.equals("END")) {
-                    break;
+            synchronized (App.lock) {
+                while (true) {
+                    buffer = queue.poll();
+
+                    if (buffer == null) {
+                        buffer = "wait";
+                        App.lock.wait(50);
+                        continue;
+                    }
+
+                    if (buffer.equals("END"))
+                        break;
+
+                    System.out.println(buffer);
                 }
-                System.out.println(buffer);
             }
-        } catch(InterruptedException e){
+        } catch (InterruptedException e) {
             System.out.println("interrupted");
+            if (buffer != null)
+                System.out.println(buffer);
         }
     }
 }
