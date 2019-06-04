@@ -1,6 +1,8 @@
 package com.tiad;
 
 import java.util.ArrayDeque;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class App {
     public static Object lock = new Object();
@@ -8,18 +10,13 @@ public class App {
 
         ArrayDeque<String> queue = new ArrayDeque<>();
 
-        ReadWorker reader = new ReadWorker(queue);
-        WriteWorker writer = new WriteWorker(queue);
+        ReadWriteLock lock = new ReentrantReadWriteLock();
+        ReadWorker reader = new ReadWorker(queue, lock);
+        WriteWorker writer = new WriteWorker(queue, lock);
 
         new Thread(reader).start();
         Thread writeThread = new Thread(writer);
         writeThread.setName("writer");
         writeThread.start();
-        try {
-            Thread.sleep(5000);
-            writeThread.interrupt();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 }

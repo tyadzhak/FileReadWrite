@@ -1,38 +1,42 @@
 package com.tiad;
 
 import java.util.ArrayDeque;
+import java.util.concurrent.locks.ReadWriteLock;
 
 public class WriteWorker implements Runnable {
 
-    private ArrayDeque<String> queue;
+    private final ArrayDeque<String> queue;
+    private final ReadWriteLock lock;
 
-    public WriteWorker(ArrayDeque<String> queue) {
+    public WriteWorker(ArrayDeque<String> queue, ReadWriteLock lock) {
         this.queue = queue;
+        this.lock = lock;
     }
 
     @Override
     public void run() {
-        synchronized (App.lock) {
+        lock.readLock().lock();
+        try {
+            Thread currentThread = Thread.currentThread();
             String buffer = null;
-            try {
-                while (true) {
-                    buffer = queue.poll();
 
-                    if (buffer == null) {
-                        App.lock.wait(3000);
-                        continue;
-                    }
-
-                    if (buffer.equals("END"))
-                        break;
-
-                    System.out.println(buffer);
+            while (!currentThread.isInterrupted()) {
+                buffer = queue.poll();
+                if (buffer == null) {
+                    Thread.sleep(1000);
+                    continue;
                 }
-            } catch (InterruptedException e) {
-                System.out.println("interrupted: " + Thread.currentThread().getName());
-                while (!queue.isEmpty())
-                    System.out.println(queue.poll());
+
+                if (buffer.equals("END"))
+                    break;
+
+                System.out.println(buffer);
             }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            lock.readLock().unlock();
         }
     }
 }
+
