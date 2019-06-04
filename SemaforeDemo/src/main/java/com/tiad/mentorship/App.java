@@ -8,7 +8,7 @@ public class App {
 
     public static void main(String[] args) {
         App app = new App();
-        Semaphore  s = new Semaphore(1);
+        Semaphore s = new Semaphore(1);
         ExecutorService executor = Executors.newFixedThreadPool(3);
         executor.submit(() -> app.run(s));
         executor.submit(() -> app.run(s));
@@ -18,21 +18,23 @@ public class App {
     private void run(Semaphore s) {
         try {
             s.acquire();
+            for (int i = 0; i < 50; i++) {
+                String text =
+                        "new line, thread: " + Thread.currentThread().getName() + " iteration: " + i
+                                + "\n";
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                System.out.println(text);
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
+        } finally {
+            s.release();
         }
-        for (int i = 0; i < 50; i++) {
-            String text =
-                    "new line, thread: " + Thread.currentThread().getName() + " iteration: " + i
-                            + "\n";
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            System.out.println(text);
-        }
-        s.release();
+
     }
 
 }
